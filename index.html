@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUAD Library - Monthly Events & Workshops</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Spectral:ital,wght@1,600;1,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --suad-blue: #002376;
+            --suad-red: #de3831;
+            --suad-dark: #031230;
+            --suad-light: #fffffc;
+            --suad-gray-bg: #f7f0e8;
+            --suad-gray-card: #ffffff;
+            --suad-text: #24242e;
+            --suad-muted: #575973;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--suad-gray-bg);
+            color: var(--suad-text);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .mashrabiah-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(var(--suad-blue) 0.75px, transparent 0.75px), radial-gradient(var(--suad-blue) 0.75px, var(--suad-gray-bg) 0.75px);
+            background-size: 30px 30px; background-position: 0 0, 15px 15px;
+            opacity: 0.04; pointer-events: none; z-index: 0;
+        }
+        header {
+            background-color: var(--suad-blue); color: var(--suad-light);
+            padding: 24px 40px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 5px solid var(--suad-red); position: relative; z-index: 10;
+            box-shadow: 0 4px 20px rgba(0,35,118,0.2);
+        }
+        .brand-section { display: flex; align-items: center; gap: 20px; }
+        .logo-box {
+            background-color: var(--suad-light); color: var(--suad-blue);
+            font-weight: 800; font-size: 1.4rem; padding: 10px 18px; border-radius: 4px;
+        }
+        .title-group h1 { font-size: 2rem; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; }
+        .title-group p { font-size: 1rem; color: #ebe0d6; font-weight: 400; }
+        .clock-container { text-align: right; background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 8px; }
+        #current-time { font-size: 2.2rem; font-weight: 700; font-family: monospace; line-height: 1; }
+        #current-date { font-size: 0.95rem; color: #ebe0d6; margin-top: 4px; }
+        .main-content { flex: 1; padding: 30px 40px; display: flex; flex-direction: column; z-index: 1; overflow-y: auto; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .section-header h2 { font-size: 1.5rem; color: var(--suad-blue); font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
+        .section-header h2::before { content: ''; display: inline-block; width: 8px; height: 24px; background-color: var(--suad-red); border-radius: 2px; }
+        .view-controls { display: flex; gap: 10px; }
+        .btn { background-color: var(--suad-gray-card); color: var(--suad-blue); border: 2px solid var(--suad-blue); padding: 8px 16px; font-weight: 600; border-radius: 6px; cursor: pointer; }
+        .btn:hover, .btn.active { background-color: var(--suad-blue); color: var(--suad-light); }
+        .events-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px; padding-bottom: 20px; }
+        .event-card { background: var(--suad-gray-card); border-radius: 10px; padding: 24px; box-shadow: 0 4px 15px rgba(0,35,118,0.06); border-left: 6px solid var(--suad-blue); display: flex; flex-direction: column; justify-content: space-between; }
+        .event-card.today { border-left-color: var(--suad-red); background: linear-gradient(to right, rgba(222,56,49,0.03), #ffffff 15%); }
+        .event-date-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--suad-gray-bg); color: var(--suad-blue); padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; margin-bottom: 12px; }
+        .event-title { font-size: 1.15rem; font-weight: 700; color: var(--suad-dark); margin-bottom: 12px; line-height: 1.4; }
+        .event-footer { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; border-top: 1px dashed #eee; padding-top: 12px; }
+        .presenter-tag { color: var(--suad-blue); font-weight: 600; }
+        .location-tag { background: #eef3fc; color: var(--suad-blue); padding: 4px 10px; border-radius: 4px; }
+        .ticker-wrap { background-color: var(--suad-dark); color: var(--suad-light); padding: 12px 20px; display: flex; align-items: center; font-size: 0.95rem; border-top: 2px solid rgba(255,255,255,0.1); }
+        .ticker-badge { background-color: var(--suad-red); color: white; padding: 4px 10px; border-radius: 4px; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; margin-right: 15px; }
+        .ticker-content { overflow: hidden; white-space: nowrap; flex: 1; }
+        .ticker-text { display: inline-block; animation: ticker 35s linear infinite; }
+        @keyframes ticker { 0% { transform: translate3d(100%, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
+    </style>
+</head>
+<body>
+    <div class="mashrabiah-bg"></div>
+    <header>
+        <div class="brand-section">
+            <div class="logo-box">SUAD</div>
+            <div class="title-group">
+                <h1>Library Events & Training</h1>
+                <p>Sorbonne University Abu Dhabi — October 2026 Schedule</p>
+            </div>
+        </div>
+        <div class="clock-container">
+            <div id="current-time">00:00:00</div>
+            <div id="current-date">Loading date...</div>
+        </div>
+    </header>
+    <div class="main-content">
+        <div class="section-header">
+            <h2>Upcoming Library Workshops & Sessions</h2>
+            <div class="view-controls">
+                <button class="btn active" onclick="filterEvents('all')">All Events</button>
+                <button class="btn" onclick="filterEvents('today')">Today</button>
+                <button class="btn" onclick="toggleFullscreen()">Fullscreen</button>
+            </div>
+        </div>
+        <div class="events-grid" id="events-container"></div>
+    </div>
+    <div class="ticker-wrap">
+        <div class="ticker-badge">Notice</div>
+        <div class="ticker-content">
+            <span class="ticker-text">Welcome to the SUAD Library! Please register for workshops via LibCal. Silence mobile phones in study areas. Library Hours: Mon-Thu 08:00 - 22:00, Fri 08:00 - 12:00, Sun 09:00 - 17:00.</span>
+        </div>
+    </div>
+    <script>
+        const eventsData = [
+            {date: "2026-10-07", startTime: "14:30", endTime: "15:30", title: "Discover Notebook Gemini", presenter: "Library Staff", location: "Library Meeting Room"},
+            {date: "2026-10-12", startTime: "12:00", endTime: "13:00", title: "Evaluating Information Sources", presenter: "Abdelaziz Galal", location: "Library Meeting Room"},
+            {date: "2026-10-12", startTime: "13:00", endTime: "14:00", title: "AI Conversational Searching & Business Searching Interface: What's New", presenter: "Yosra Awara", location: "Online / TBA"},
+            {date: "2026-10-13", startTime: "16:00", endTime: "17:00", title: "Presentation of the library resources in Art (Undergraduates)", presenter: "Marie Gibon", location: "Library Meeting Room"},
+            {date: "2026-10-14", startTime: "03:00", endTime: "04:00", title: "Presentation of the library resources in Art (Postgraduates)", presenter: "Marie Gibon", location: "Library Meeting Room"},
+            {date: "2026-10-14", startTime: "10:00", endTime: "11:30", title: "Research Communication Lab 9: Increasing the Real-World Impact of Your Work", presenter: "Taylor & Francis", location: "Online / TBA"},
+            {date: "2026-10-20", startTime: "14:30", endTime: "15:30", title: "Discover CAIRN database", presenter: "Nabil Derrough", location: "Online / TBA"},
+            {date: "2026-10-21", startTime: "15:00", endTime: "16:00", title: "Evaluating Information Sources", presenter: "Abdelaziz Galal", location: "Library Meeting Room"},
+            {date: "2026-10-22", startTime: "14:30", endTime: "15:30", title: "Discover Notebook Gemini", presenter: "Nabil Derrough", location: "Library Meeting Room"},
+            {date: "2026-10-26", startTime: "12:00", endTime: "13:00", title: "General Vs. Subject Specific Databases", presenter: "Abdelaziz Galal", location: "Library Meeting Room"},
+            {date: "2026-10-26", startTime: "13:45", endTime: "14:45", title: "EBSCO تعزيز البحث الأكاديمي باستخدام أدوات الذكاء الاصطناعي مع", presenter: "Yosra Awara", location: "Online / TBA"},
+            {date: "2026-10-27", startTime: "14:30", endTime: "15:30", title: "Discover CAIRN database", presenter: "Nabil Derrough", location: "Online / TBA"},
+            {date: "2026-10-28", startTime: "15:00", endTime: "16:00", title: "General Vs. Subject Specific Databases", presenter: "Abdelaziz Galal", location: "Library Meeting Room"}
+        ];
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('current-time').innerText = now.toLocaleTimeString('en-US', { hour12: false });
+            document.getElementById('current-date').innerText = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+        }
+        setInterval(updateClock, 1000); updateClock();
+        function renderEvents(filter = 'all') {
+            const container = document.getElementById('events-container');
+            container.innerHTML = '';
+            const todayStr = '2026-10-05';
+            eventsData.forEach(ev => {
+                if (filter === 'today' && ev.date !== todayStr) return;
+                const isToday = ev.date === todayStr;
+                const formattedDate = new Date(ev.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const card = document.createElement('div');
+                card.className = `event-card ${isToday ? 'today' : ''}`;
+                card.innerHTML = `<div><div class="event-date-badge">📅 ${formattedDate} &nbsp;|&nbsp; ⏰ ${ev.startTime} - ${ev.endTime}</div><h3 class="event-title">${ev.title}</h3></div><div class="event-footer"><span class="presenter-tag">👤 ${ev.presenter}</span><span class="location-tag">📍 ${ev.location}</span></div>`;
+                container.appendChild(card);
+            });
+        }
+        function filterEvents(type) {
+            document.querySelectorAll('.view-controls .btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            renderEvents(type);
+        }
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); }
+            else { if (document.exitFullscreen) { document.exitFullscreen(); } }
+        }
+        renderEvents('all');
+    </script>
+</body>
+</html>
